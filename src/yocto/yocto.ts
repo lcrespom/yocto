@@ -1,5 +1,5 @@
 import vdom from 'snabbdom/snabbdom.bundle';
-const { patch: render, h } = vdom;
+const { patch: render } = vdom;
 import { VNode } from 'snabbdom/src/vnode';
 export { VNode } from 'snabbdom/src/vnode';
 import { tagHelpers } from './tag-helpers';

@@ -19,7 +19,7 @@ interface AppModel {
 
 type AppAction = any;
 
-let postAction: Dispatcher<AppModel, AppAction>;
+type AppDispatcher = Dispatcher<AppModel, AppAction>;
 
 
 function init(props): AppModel {
@@ -30,12 +30,12 @@ function init(props): AppModel {
 	};
 }
 
-function view(model: AppModel): VNode {
+function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	return H.div([
 		H.h1('Transactions'),
 		'What is your name? ',
 		H.input({ on: {
-			input: evt => postAction({ type: 'name', name: evt.target.value })
+			input: evt => dispatch({ type: 'name', name: evt.target.value })
 		}}),
 		H.br(),
 		H.span('Hello ' + model.name),
@@ -46,7 +46,7 @@ function update(model: AppModel, action: AppAction): AppModel {
 	const newModel = R.merge(model);
 	switch (action.type) {
 		case 'name':
-			return newModel({ name: action.name })
+			return newModel({ name: action.name });
 		default:
 			return model;
 	}
@@ -56,13 +56,13 @@ let bankApp = {
 	init,
 	view,
 	update
-}
+};
 
 function main() {
 	let element = document.getElementById('app');
 	if (!element)
 		throw Error('No "#app" element');
-	postAction = runComponent(bankApp, element);
+	runComponent(bankApp, element);
 }
 
 
