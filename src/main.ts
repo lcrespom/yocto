@@ -19,7 +19,7 @@ interface AppModel {
 
 type AppAction = any;
 
-type AppDispatcher = Dispatcher<AppModel, AppAction>;
+type AppDispatcher = Dispatcher<AppAction>;
 
 
 function init(props): AppModel {
@@ -34,9 +34,14 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	return H.div([
 		H.h1('Transactions'),
 		'What is your name? ',
-		H.input({ on: {
-			input: evt => dispatch({ type: 'name', name: evt.target.value })
-		}}),
+		H.input({
+			on: {
+				input: evt => dispatch({ type: 'name', name: evt.target.value })
+			},
+			props: {
+				value: model.name
+			}
+		}),
 		H.br(),
 		H.span('Hello ' + model.name),
 	]);
@@ -62,7 +67,7 @@ function main() {
 	let element = document.getElementById('app');
 	if (!element)
 		throw Error('No "#app" element');
-	runComponent(bankApp, element);
+	runComponent(bankApp, element, {}, 'txns');
 }
 
 
