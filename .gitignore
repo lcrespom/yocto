@@ -4,3 +4,4 @@ web/*.js*
 npm-debug.log*
 .DS_Store
 .vscode/
+old/
