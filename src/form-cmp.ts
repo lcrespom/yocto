@@ -98,6 +98,8 @@ function view(model: FormModel, dispatch: FormDispatcher): VNode {
 // -------------------- Update --------------------
 
 function update(model: FormModel, action: FormAction): FormModel {
+	if (!action.type.startsWith('.form'))
+		return model;
 	switch (action.type) {
 		case 'form.update-field':
 			let formData = R.merge(model.formData, {

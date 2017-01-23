@@ -42,6 +42,7 @@ function init(props): AppModel {
 	};
 }
 
+
 function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	return H.div([
 		H.h1('Transactions'),
@@ -60,6 +61,7 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 		H.span('Hello ' + model.name),
 	]);
 }
+
 
 function mapObj(obj: any, mapper: (key: string, value: any) => any): any {
 	let pairs: any = R.map(
@@ -84,11 +86,9 @@ function update(model: AppModel, action: AppAction): AppModel {
 			return model;
 		default:
 			return updateComponents(model, action, { form: FormComponent });
-			// return newModel({
-			// 	form: FormComponent.update(model.form, action as any)
-			// });
 	}
 }
+
 
 let bankApp = {
 	init,
@@ -102,6 +102,5 @@ function main() {
 		throw Error('No "#app" element');
 	runComponent(bankApp, element, {}, 'txns');
 }
-
 
 main();
