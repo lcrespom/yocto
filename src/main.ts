@@ -61,6 +61,19 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	]);
 }
 
+function mapObj(obj: any, mapper: (key: string, value: any) => any): any {
+	let pairs: any = R.map(
+		([key, value]: any) => [key, mapper(key, value)],
+		R.toPairs(obj)
+	);
+	return R.fromPairs(pairs);
+}
+
+function updateComponents(appModel: AppModel, action: any, models: any): AppModel {
+	return R.merge(appModel, mapObj(models,
+		(model, component) => component.update(appModel[model], action)));
+}
+
 function update(model: AppModel, action: AppAction): AppModel {
 	const newModel = R.merge(model);
 	switch (action.type) {
@@ -70,9 +83,10 @@ function update(model: AppModel, action: AppAction): AppModel {
 			console.log(action.formData);
 			return model;
 		default:
-			return newModel({
-				form: FormComponent.update(model.form, action as any)
-			});
+			return updateComponents(model, action, { form: FormComponent });
+			// return newModel({
+			// 	form: FormComponent.update(model.form, action as any)
+			// });
 	}
 }
 
