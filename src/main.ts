@@ -1,4 +1,5 @@
 import { runComponent, H, VNode, Dispatcher } from './yocto/yocto';
+import { FormModel, FormAction, FormComponent } from './form-cmp';
 import * as R from 'ramda';
 
 
@@ -12,12 +13,18 @@ interface Transaction {
 }
 
 interface AppModel {
-	name: string;	//Testing only
+	name: string;
+	form: FormModel;
 	query: SearchQuery;
 	txns: Transaction[];
 }
 
-type AppAction = any;
+type AppAction = NameAction | FormAction;
+
+type NameAction = {
+	type: 'name';
+	name: string;
+};
 
 type AppDispatcher = Dispatcher<AppAction>;
 
@@ -25,6 +32,11 @@ type AppDispatcher = Dispatcher<AppAction>;
 function init(props): AppModel {
 	return {
 		name: '',
+		form: FormComponent.init({
+			fields: ['fromDate', 'toDate'],
+			labels: ['From date', 'To date'],
+			formData: { fromDate: '', toDate: '' }
+		}),
 		query: { fromDate: new Date(), toDate: new Date },
 		txns: []
 	};
@@ -42,7 +54,9 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 				value: model.name
 			}
 		}),
-		H.br(),
+		H.hr(),
+		FormComponent.view(model.form, dispatch),
+		H.hr(),
 		H.span('Hello ' + model.name),
 	]);
 }
@@ -52,8 +66,13 @@ function update(model: AppModel, action: AppAction): AppModel {
 	switch (action.type) {
 		case 'name':
 			return newModel({ name: action.name });
-		default:
+		case 'form.submit':
+			console.log(action.formData);
 			return model;
+		default:
+			return newModel({
+				form: FormComponent.update(model.form, action as any)
+			});
 	}
 }
 

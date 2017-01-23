@@ -11,9 +11,8 @@ let global = window as any;
 
 export type Dispatcher<A> = (action: A) => void;
 export type ModelInit<M> = (props?: any) => M;
-export type Updater<M, A> = (model: M, action: A, onEvent?: ParentDispatch) => M;
+export type Updater<M, A> = (model: M, action: A, dispatch?: Dispatcher<A>) => M;
 export type Renderer<M, A> = (model: M, dispatch: Dispatcher<A>) => VNode;
-export type ParentDispatch = (evt: any) => any;
 
 export interface Component<M, A> {
 	init: ModelInit<M>;
@@ -34,7 +33,7 @@ export function runComponent<M, A>(component: Component<M, A>,
 			model = action.model;
 		}
 		else {
-			model = component.update(model, action);
+			model = component.update(model, action, dispatch);
 			if (debug)
 				global.yocto.debug[debug]._push(model);
 		}
