@@ -1,0 +1,6 @@
+node_modules/
+js/
+web/*.js*
+npm-debug.log*
+.DS_Store
+.vscode/
