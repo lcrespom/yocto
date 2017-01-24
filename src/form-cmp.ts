@@ -45,6 +45,8 @@ type FormDispatcher = Dispatcher<FormAction>;
 // -------------------- Parsing & Formatting --------------------
 
 function fromType(value: any, type = ''): string {
+	if (typeof value == 'string')
+		return value;
 	switch (type) {
 		case 'date':
 			return getDateStr(value);
