@@ -40,7 +40,10 @@ function init(props): AppModel {
 				fromDate: { type: 'date' },
 				toDate: { type: 'date' },
 				amount: { type: 'number' }
-			}
+			},
+			submitLabel: 'Search',
+			submitIcon: 'search',
+			hideCancel: true
 		}),
 		query: { fromDate: new Date(), toDate: new Date },
 		txns: []
@@ -51,19 +54,9 @@ function init(props): AppModel {
 function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	return H.div([
 		H.h1('Transactions'),
-		'What is your name? ',
-		H.input({
-			on: {
-				input: evt => dispatch({ type: 'name', name: evt.target.value })
-			},
-			props: {
-				value: model.name
-			}
-		}),
-		H.hr(),
 		FormComponent.view(model.form, dispatch),
-		H.hr(),
-		H.span('Hello ' + model.name),
+		H.hr()//,
+		//TableComponent.view(model.table, dispatch)
 	]);
 }
 

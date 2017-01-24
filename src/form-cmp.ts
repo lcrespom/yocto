@@ -11,7 +11,10 @@ export interface FormConfig {
 	formData: any;
 	attrs?: any;
 	submitLabel?: string;
+	submitIcon?: string;
 	cancelLabel?: string;
+	cancelIcon?: string;
+	hideCancel?: boolean;
 }
 
 export interface FormModel {
@@ -112,7 +115,25 @@ function viewFormInput(model: any,
 	]);
 }
 
-function viewFormButtons(buttons: any[]) {
+function actionButton(text: string, style: string, icon?: string, data = {}): VNode {
+	let content = icon
+		? [H.span(`.glyphicon.glyphicon-${icon}`,
+			{ attrs: { 'aria-hidden': true } }), ' ' + text]
+		: text;
+	return H.button(`.btn.btn-${style}`, data, content);
+}
+
+function viewFormButtons(model: FormModel, dispatch: FormDispatcher) {
+	let buttons: any[] = [
+		actionButton(model.config.submitLabel || 'Submit',
+			'primary', model.config.submitIcon, { attrs: { type: 'submit' } })
+	];
+	if (!model.config.hideCancel)
+		buttons.push(actionButton(model.config.cancelLabel || 'Cancel',
+			'default', model.config.cancelIcon, {
+				attrs: { type: 'button' },
+				on: { click: _ => dispatch({ type: 'form.cancel' })	}
+			}));
 	return H.div('.form-group',
 		H.div('.col-sm-12.text-center',
 			R.intersperse('\u00A0\u00A0\u00A0', buttons))
@@ -137,17 +158,7 @@ function view(model: FormModel, dispatch: FormDispatcher): VNode {
 			H.div(model.fieldLabels.map(([field, label]) =>
 				viewFormInput(model.formText, field, label,
 					model.attrs[field], updateField))),
-			viewFormButtons([
-				H.button('.btn.btn-primary', {
-					attrs: { type: 'submit' } },
-					model.config.submitLabel || 'Save'),
-				H.button('.btn.btn-default', {
-					attrs: { type: 'button' },
-					on: {
-						click: _ => dispatch({ type: 'form.cancel' })
-					} },
-					model.config.cancelLabel || 'Cancel')
-			])
+			viewFormButtons(model, dispatch)
 		])
 	]);
 }
