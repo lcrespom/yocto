@@ -10,7 +10,10 @@ interface SearchQuery {
 }
 
 interface Transaction {
+	date: string;
+	description: string;
 	amount: number;
+	balance: number;
 }
 
 interface AppModel {
@@ -46,7 +49,12 @@ function init(props): AppModel {
 			hideCancel: true
 		}),
 		query: { fromDate: new Date(), toDate: new Date },
-		txns: []
+		txns: [
+			{ date: '20/01/17', description: 'Electricity', amount: 200, balance: 1000 },
+			{ date: '21/01/17', description: 'Gas', amount: 300, balance: 800 },
+			{ date: '22/01/17', description: 'Phone', amount: 100, balance: 400 },
+			{ date: '23/01/17', description: 'Water', amount: 50, balance: 350 }
+		]
 	};
 }
 
@@ -59,7 +67,9 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 		fields: TABLE_FIELDS,
 		labels: R.map(ucfirst, TABLE_FIELDS)
 	};
-	let buttons = [];
+	let buttons = [{
+		style: 'info', icon: 'list-alt', text: 'Details',	onClick: _ => 0
+	}];
 	return H.div([
 		H.h1('Transactions'),
 		FormComponent.view(model.form, dispatch),
