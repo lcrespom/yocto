@@ -1,4 +1,5 @@
 import { H, Dispatcher, VNode } from './yocto/yocto';
+import { getDateStr, parseDateTime } from './date-utils';
 import * as R from 'ramda';
 
 
@@ -19,7 +20,7 @@ export type FormAction = UpdateFieldAction | SubmitAction | CancelAction;
 interface UpdateFieldAction {
 	type: 'form.update-field';
 	field: string;
-	value: string;
+	value: any;
 }
 
 interface SubmitAction {
@@ -36,9 +37,32 @@ type FormDispatcher = Dispatcher<FormAction>;
 
 // -------------------- View --------------------
 
+function fromType(value: any, type = ''): string {
+	switch (type) {
+		case 'date':
+			return getDateStr(value);
+		case 'number':
+			// ToDo: limit number of decimals
+			return '' + value;
+		default:
+			return value || '';
+	}
+}
+
+function toType(value: string, type = '') {
+	switch (type) {
+		case 'date':
+			return parseDateTime(value);
+		case 'number':
+			return Number(value);
+		default:
+			return value || '';
+	}
+}
+
 function viewFormInput(model: any,
 	field: string, label: string, attrs: any = {}, changed) {
-	attrs.value = model[field] || '';
+	attrs.value = fromType(model[field], attrs.type);
 	const autoFocusHook = (autoFocus: boolean) =>
 		autoFocus
 			? { insert: vnode => vnode.elm.focus() }
@@ -66,7 +90,9 @@ function view(model: FormModel, dispatch: FormDispatcher): VNode {
 	if (!model.fieldLabels) return H.div();
 	let attrs = model.attrs || {};
 	const updateField = (field, value) => dispatch({
-		type: 'form.update-field', field, value
+		type: 'form.update-field',
+		field,
+		value: toType(value, attrs[field] ? attrs[field].type : '')
 	});
 	return H.div([
 		H.form('.form-horizontal', {
