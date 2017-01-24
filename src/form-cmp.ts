@@ -42,6 +42,7 @@ function fromType(value: any, type = ''): string {
 		case 'date':
 			return getDateStr(value);
 		case 'number':
+		case 'range':
 			// ToDo: limit number of decimals
 			return '' + value;
 		default:
@@ -54,6 +55,7 @@ function toType(value: string, type = '') {
 		case 'date':
 			return parseDateTime(value);
 		case 'number':
+		case 'range':
 			return Number(value);
 		default:
 			return value || '';
