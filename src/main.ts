@@ -35,7 +35,11 @@ function init(props): AppModel {
 		form: FormComponent.init({
 			fields: ['fromDate', 'toDate'],
 			labels: ['From date', 'To date'],
-			formData: { fromDate: '', toDate: '' }
+			formData: { fromDate: '', toDate: '' },
+			attrs: {
+				fromDate: { type: 'date' },
+				toDate: { type: 'date' }
+			}
 		}),
 		query: { fromDate: new Date(), toDate: new Date },
 		txns: []

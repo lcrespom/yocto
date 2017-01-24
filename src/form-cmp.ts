@@ -98,7 +98,7 @@ function view(model: FormModel, dispatch: FormDispatcher): VNode {
 // -------------------- Update --------------------
 
 function update(model: FormModel, action: FormAction): FormModel {
-	if (!action.type.startsWith('.form'))
+	if (!action.type.startsWith('form.'))
 		return model;
 	switch (action.type) {
 		case 'form.update-field':
