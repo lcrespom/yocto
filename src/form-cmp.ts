@@ -5,14 +5,20 @@ import * as R from 'ramda';
 
 // -------------------- Types --------------------
 
-export interface FormModel {
+export interface FormConfig {
 	fields: string[];
 	labels: string[];
 	formData: any;
-	fieldLabels?: string[][];
-	attrs?: { [field: string]: any };
+	attrs?: any;
 	submitLabel?: string;
 	cancelLabel?: string;
+}
+
+export interface FormModel {
+	config: FormConfig;
+	formText: any;
+	attrs: any;
+	fieldLabels: string[][];
 }
 
 export type FormAction = UpdateFieldAction | SubmitAction | CancelAction;
@@ -25,6 +31,7 @@ interface UpdateFieldAction {
 
 interface SubmitAction {
 	type: 'form.submit';
+	formText: any;
 	formData: any;
 }
 
@@ -35,7 +42,7 @@ interface CancelAction {
 type FormDispatcher = Dispatcher<FormAction>;
 
 
-// -------------------- View --------------------
+// -------------------- Parsing & Formatting --------------------
 
 function fromType(value: any, type = ''): string {
 	switch (type) {
@@ -62,9 +69,31 @@ function toType(value: string, type = '') {
 	}
 }
 
+function mapObj(obj: any, mapper: (key: string, value: any) => any): any {
+	let pairs: any = R.map(
+		([key, value]: any) => [key, mapper(key, value)],
+		R.toPairs(obj)
+	);
+	return R.fromPairs(pairs);
+}
+
+function formatForm(formData, attrs) {
+	return mapObj(formData,
+		(field, value) => fromType(value, attrs[field].type)
+	);
+}
+
+function parseForm(formText, attrs) {
+	return mapObj(formText,
+		(field, value) => toType(value, attrs[field].type)
+	);
+}
+
+// -------------------- View --------------------
+
 function viewFormInput(model: any,
 	field: string, label: string, attrs: any = {}, changed) {
-	attrs.value = fromType(model[field], attrs.type);
+	attrs.value = model[field] || '';
 	const autoFocusHook = (autoFocus: boolean) =>
 		autoFocus
 			? { insert: vnode => vnode.elm.focus() }
@@ -90,33 +119,32 @@ function viewFormButtons(buttons: any[]) {
 
 function view(model: FormModel, dispatch: FormDispatcher): VNode {
 	if (!model.fieldLabels) return H.div();
-	let attrs = model.attrs || {};
 	const updateField = (field, value) => dispatch({
-		type: 'form.update-field',
-		field,
-		value: toType(value, attrs[field] ? attrs[field].type : '')
+		type: 'form.update-field', field, value
 	});
 	return H.div([
 		H.form('.form-horizontal', {
 			attrs: { action: 'javascript:void(0)' },
 			on: {
 				submit: _ => dispatch({
-					type: 'form.submit', formData: model.formData
+					type: 'form.submit',
+					formText: model.formText,
+					formData: parseForm(model.formText, model.attrs)
 				})
 			}}, [
 			H.div(model.fieldLabels.map(([field, label]) =>
-				viewFormInput(model.formData, field, label,
-					attrs[field], updateField))),
+				viewFormInput(model.formText, field, label,
+					model.attrs[field], updateField))),
 			viewFormButtons([
 				H.button('.btn.btn-primary', {
 					attrs: { type: 'submit' } },
-					model.submitLabel || 'Save'),
+					model.config.submitLabel || 'Save'),
 				H.button('.btn.btn-default', {
 					attrs: { type: 'button' },
 					on: {
 						click: _ => dispatch({ type: 'form.cancel' })
 					} },
-					model.cancelLabel || 'Cancel')
+					model.config.cancelLabel || 'Cancel')
 			])
 		])
 	]);
@@ -130,21 +158,26 @@ function update(model: FormModel, action: FormAction): FormModel {
 		return model;
 	switch (action.type) {
 		case 'form.update-field':
-			let formData = R.merge(model.formData, {
+			let formText = R.merge(model.formText, {
 				[action.field]: action.value
 			});
-			return R.merge(model, { formData });
+			return R.merge(model, { formText });
 		default:
 			return model;
 	}
 }
 
-
-function init(props?: FormModel): FormModel {
-	if (!props)
-		throw Error('props parameter is mandatory for FormComponent');
-	props.fieldLabels = R.zip(props.fields, props.labels);
-	return props;
+function init(config: FormConfig): FormModel {
+	let attrs = config.attrs || {};
+	for (let field of config.fields)
+		attrs[field] = attrs[field] || {};
+	let formText = formatForm(config.formData, attrs);
+	return {
+		config,
+		formText,
+		attrs,
+		fieldLabels: R.zip(config.fields, config.labels),
+	};
 }
 
 

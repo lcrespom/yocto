@@ -33,12 +33,13 @@ function init(props): AppModel {
 	return {
 		name: '',
 		form: FormComponent.init({
-			fields: ['fromDate', 'toDate'],
-			labels: ['From date', 'To date'],
+			fields: ['fromDate', 'toDate', 'name', 'amount'],
+			labels: ['From date', 'To date', 'Name', 'Amount'],
 			formData: { fromDate: new Date(), toDate: new Date() },
 			attrs: {
 				fromDate: { type: 'date' },
-				toDate: { type: 'date' }
+				toDate: { type: 'date' },
+				amount: { type: 'number' }
 			}
 		}),
 		query: { fromDate: new Date(), toDate: new Date },
@@ -86,7 +87,7 @@ function update(model: AppModel, action: AppAction): AppModel {
 		case 'name':
 			return newModel({ name: action.name });
 		case 'form.submit':
-			console.log(action.formData);
+			console.log('Submit action:', action);
 			return model;
 		default:
 			return updateComponents(model, action, { form: FormComponent });
