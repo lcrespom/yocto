@@ -18,25 +18,18 @@ interface Transaction {
 }
 
 interface AppModel {
-	name: string;
 	form: FormModel;
 	query: SearchQuery;
 	txns: Transaction[];
 }
 
-type AppAction = NameAction | FormAction | TxnAction;
-
-type NameAction = {
-	type: 'name';
-	name: string;
-};
+type AppAction = FormAction | TxnAction;
 
 type AppDispatcher = Dispatcher<AppAction>;
 
 
 function init(props): AppModel {
 	return {
-		name: '',
 		form: FormComponent.init({
 			fields: ['fromDate', 'toDate'],
 			labels: ['From date', 'To date'],
@@ -77,8 +70,6 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 function update(model: AppModel, action: AppAction, dispatch: AppDispatcher): AppModel {
 	const newModel = R.merge(model);
 	switch (action.type) {
-		case 'name':
-			return newModel({ name: action.name });
 		case 'form.submit':
 			let query = {
 				fromDate: action.formData.fromDate,
