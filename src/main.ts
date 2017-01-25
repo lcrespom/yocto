@@ -1,6 +1,7 @@
 import { runComponent, H, VNode, Dispatcher } from './yocto/yocto';
 import { FormModel, FormAction, FormComponent } from './form-cmp';
 import { viewCrudTable } from './crud-table-view';
+import { searchTxns, TxnAction } from './txns-svc';
 import * as R from 'ramda';
 
 
@@ -23,7 +24,7 @@ interface AppModel {
 	txns: Transaction[];
 }
 
-type AppAction = NameAction | FormAction;
+type AppAction = NameAction | FormAction | TxnAction;
 
 type NameAction = {
 	type: 'name';
@@ -49,12 +50,7 @@ function init(props): AppModel {
 			hideCancel: true
 		}),
 		query: { fromDate: new Date(), toDate: new Date },
-		txns: [
-			{ date: '20/01/17', description: 'Electricity', amount: 200, balance: 1000 },
-			{ date: '21/01/17', description: 'Gas', amount: 300, balance: 800 },
-			{ date: '22/01/17', description: 'Phone', amount: 100, balance: 400 },
-			{ date: '23/01/17', description: 'Water', amount: 50, balance: 350 }
-		]
+		txns: []
 	};
 }
 
@@ -78,15 +74,20 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 	]);
 }
 
-
-function update(model: AppModel, action: AppAction): AppModel {
+function update(model: AppModel, action: AppAction, dispatch: AppDispatcher): AppModel {
 	const newModel = R.merge(model);
 	switch (action.type) {
 		case 'name':
 			return newModel({ name: action.name });
 		case 'form.submit':
-			console.log('Submit action:', action);
-			return model;
+			let query = {
+				fromDate: action.formData.fromDate,
+				toDate: action.formData.toDate
+			};
+			searchTxns(query.fromDate, query.toDate, dispatch);
+			return newModel({ query });
+		case 'txns.result':
+			return newModel({ txns: action.data });
 		default:
 			return newModel({ form: FormComponent.update(model.form, action) });
 	}
