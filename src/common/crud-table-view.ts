@@ -1,4 +1,4 @@
-import { H, VNode } from './yocto/yocto';
+import { H, VNode } from '../yocto/yocto';
 import * as R from 'ramda';
 
 

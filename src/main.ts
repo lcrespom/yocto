@@ -1,6 +1,6 @@
 import { runComponent, H, VNode, Dispatcher } from './yocto/yocto';
-import { FormModel, FormAction, FormComponent } from './form-cmp';
-import { viewCrudTable } from './crud-table-view';
+import { FormModel, FormAction, FormComponent } from './common/form-cmp';
+import { viewCrudTable } from './common/crud-table-view';
 import { searchTxns, TxnAction } from './txns-svc';
 import * as R from 'ramda';
 

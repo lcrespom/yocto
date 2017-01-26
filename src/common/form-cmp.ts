@@ -1,4 +1,4 @@
-import { H, Dispatcher, VNode } from './yocto/yocto';
+import { H, Dispatcher, VNode } from '../yocto/yocto';
 import { getDateStr, parseDateTime } from './date-utils';
 import * as R from 'ramda';
 
