@@ -174,7 +174,7 @@ function update(model: FormModel, action: FormAction): FormModel {
 			let formText = R.merge(model.formText, {
 				[action.field]: action.value
 			});
-			return R.merge(model, { formText });
+			return { ...model, formText };
 		default:
 			return model;
 	}

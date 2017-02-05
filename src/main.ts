@@ -68,7 +68,6 @@ function view(model: AppModel, dispatch: AppDispatcher): VNode {
 }
 
 function update(model: AppModel, action: AppAction, dispatch: AppDispatcher): AppModel {
-	const newModel = R.merge(model);
 	switch (action.type) {
 		case 'form.submit':
 			let query = {
@@ -76,11 +75,11 @@ function update(model: AppModel, action: AppAction, dispatch: AppDispatcher): Ap
 				toDate: action.formData.toDate
 			};
 			searchTxns(query.fromDate, query.toDate, dispatch);
-			return newModel({ query });
+			return { ...model, query };
 		case 'txns.result':
-			return newModel({ txns: action.data });
+			return { ...model, txns: action.data };
 		default:
-			return newModel({ form: FormComponent.update(model.form, action) });
+			return { ...model, form: FormComponent.update(model.form, action) };
 	}
 }
 
